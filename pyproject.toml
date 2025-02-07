@@ -14,7 +14,9 @@ classifiers = [
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 dependencies = [
-  "pywb"
+  "pywb",
+  "cdxj-indexer",
+  "wacz"
 ]
 
 [project.urls]

@@ -1,3 +1,5 @@
 .venv
 dist
 proxy-certs
+collections/**/*.cdxj
+collections/**/*.warc.gz

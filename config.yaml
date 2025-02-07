@@ -1,14 +1,49 @@
+# pywb configuration
+
+# The set of web archive collections we are working with:
 collections:
-  # Live Index
+  # Live web 'index'
   live: $live
-  # Internet Archive
+  
+  # Internet Archive (Memento API)
   ia: memento+https://web.archive.org/web/
-  #ia: cdx+https://web.archive.org/cdx;/web
+  
+  # Internet Archive (CDX API)
+  ia_cdx: cdx+https://web.archive.org/cdx /web
 
+  # A stack of collections, attempting to limit re-fetches:
+  stack:
+    sequence:
+    # First try to read from the collection we are recording into
+    - name: mementos
+      index_paths: ./collections/mementos/indexes
+      # Trailing slash is needed here:
+      archive_paths: ./collections/mementos/archive/
+    # If we don't have it locally (or it's not indexed yet), fetch from IA
+    - name: ia
+      index: memento+https://web.archive.org/web/
+
+
+# Setting for recording web archives:
 recorder:
-   source_coll: ia
+  # Use this source collection when recording:
+  source_coll: stack
+  # Only record what comes through the archival source channel:
+  source_filter: ia
+  # How the WARCs should be named:
+  filename_template: memento-lifeboat-{timestamp}-{random}.warc.gz
 
+
+# Allow use as a web proxy:
 proxy:
-  source_coll: ia
+  # Record things into the 'mementos' collection (local on disk):
   coll: mementos
+  # Record what goes through the proxy, using the recording config above:
   recording: true
+  # Use a very early timestamp so we default to the first Memento:
+  # https://pywb.readthedocs.io/en/latest/manual/configuring.html#default-timestamp
+  default_timestamp: "19910101000000"
+
+
+# Automatically index WARCs here every X seconds:
+autoindex: 10
