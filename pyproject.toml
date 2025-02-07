@@ -1,0 +1,27 @@
+[project]
+name = "memento_lifeboat"
+version = "0.0.1"
+authors = [
+  { name="Andy Jackson", email="anj@anjackson.net" },
+]
+description = "Tiny lifeboats for web archive mementos"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+  "pywb"
+]
+
+[project.urls]
+Homepage = "https://github.com/anjackson/memento-lifeboat"
+Issues = "https://github.com/anjackson/memento-lifeboat/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+

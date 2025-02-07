@@ -1,0 +1,14 @@
+collections:
+  # Live Index
+  live: $live
+  # Internet Archive
+  ia: memento+https://web.archive.org/web/
+  #ia: cdx+https://web.archive.org/cdx;/web
+
+recorder:
+   source_coll: ia
+
+proxy:
+  source_coll: ia
+  coll: mementos
+  recording: true
