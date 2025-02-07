@@ -1,7 +1,7 @@
 Memento Lifeboat
 ================
 
-An experimental ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for replicating pages from web archives.
+An experimental ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for replicating pages held in web archives.
 
 The proposed workflow is:
 
@@ -12,6 +12,13 @@ The proposed workflow is:
 - Bundle the WACZ with a suitable index.html wrapper to allow playback from static resources.
 
 
+```sh
+hatch run shot-scraper install -b chromium
+```
+
+```sh
+hatch run shot-scraper multi -b chromium --browser-arg '--proxy-server=http://localhost:8080' shots.yml
+```
 
 
 ## Extraction

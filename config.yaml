@@ -14,15 +14,17 @@ collections:
   # A stack of collections, attempting to limit re-fetches:
   stack:
     sequence:
-    # First try to read from the collection we are recording into
+    # First try to read from the collection we are recording into:
     - name: mementos
       index_paths: ./collections/mementos/indexes
       # Trailing slash is needed here:
       archive_paths: ./collections/mementos/archive/
-    # If we don't have it locally (or it's not indexed yet), fetch from IA
+    # If we don't have it locally (or it's not indexed yet), fetch from IA:
     - name: ia
       index: memento+https://web.archive.org/web/
-
+    # This is what it would look like if we fall back onto the live web:
+    #- name: live
+    #  index: $live
 
 # Setting for recording web archives:
 recorder:
@@ -32,7 +34,10 @@ recorder:
   source_filter: ia
   # How the WARCs should be named:
   filename_template: memento-lifeboat-{timestamp}-{random}.warc.gz
-
+  # Note that if we add a dedup_policy, we can instantly update the index as we go, but we need a redis server:
+  # https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=dedup_policy#dedup-options-for-recording
+  #dedup_policy: skip
+  #dedup_index_url: 'redis://localhost:6379/0/pywb:{coll}:cdxj'   # default when omitted
 
 # Allow use as a web proxy:
 proxy:
@@ -40,10 +45,13 @@ proxy:
   coll: mementos
   # Record what goes through the proxy, using the recording config above:
   recording: true
-  # Use a very early timestamp so we default to the first Memento:
+  # Use a fairly early timestamp so we default to a likely good Memento:
   # https://pywb.readthedocs.io/en/latest/manual/configuring.html#default-timestamp
-  default_timestamp: "19910101000000"
-
+  default_timestamp: "20050101000000"
 
 # Automatically index WARCs here every X seconds:
 autoindex: 10
+
+# Gather responsive layout resources:
+# https://pywb.readthedocs.io/en/latest/manual/configuring.html#auto-fetch-responsive-recording
+enable_auto_fetch: true

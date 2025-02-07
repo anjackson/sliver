@@ -16,7 +16,8 @@ license-files = ["LICEN[CS]E*"]
 dependencies = [
   "pywb",
   "cdxj-indexer",
-  "wacz"
+  "wacz",
+  "shot-scraper"
 ]
 
 [project.urls]

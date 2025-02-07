@@ -1,0 +1,6 @@
+- url: http://anjackson.net/
+  output: anjackson.net-homepage.png
+- url: http://nutshells.anjackson.net/
+  output: nutshells-homepage.png
+- url: http://echums.net/
+  output: echums-homepage.png
