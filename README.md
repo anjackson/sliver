@@ -3,19 +3,37 @@ Memento Lifeboat
 
 An experimental ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for replicating pages held in web archives.
 
-The proposed workflow is:
+The overall workflow is:
 
-- Use [pywb](https://github.com/webrecorder/pywb) as a proxy to talk to web archives, and leverage it's support [extracting and recording items into WARCs with provenance info](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode).
-- Take a URL prefix as an argument and look up URLs under that prefix.
-- Use browser-based screen-shotting tools to run through that list of URLs, via the proxy.
-- Take the resulting WARC(s) and package them as WACZ.
-- Bundle the WACZ with a suitable index.html wrapper to allow playback from static resources.
+- Set up [pywb](https://github.com/webrecorder/pywb) as a proxy to talk to web archives, and leverage it's support [extracting and recording items into WARCs with provenance info](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode).
+- Generate a set of original URLs that we want to gather.
+- Use browser-based screen-shotting tools to run through that list of URLs, going via the pywb proxy.
+- Take the resulting WARC(s) and package them as WACZ with page detection and text extraction.
+- Bundle the WACZ with a suitable index.html wrapper to allow playback from static resources. This could be running playback directly, or use the screenshots as a gallery and have a separate playback page or frame.
+
+
+## Generating a list of URLs
 
 ```sh
-curl -o out.cdx -g "https://web.archive.org/cdx/search/cdx?url=vawnet.org&collapse=urlkey&matchType=prefix&limit=10000&filter=statuscode:[23]..&showResumeKey=true"
+curl -o out.cdx -g "https://web.archive.org/cdx/search/cdx?url=example.com&collapse=urlkey&matchType=prefix&limit=10000&filter=statuscode:[23]..&showResumeKey=true"
 ```
 
-Then extract the urls from the CDX. Use it to populate a `shots.yml` file.
+Then extract the urls from the CDX. 
+
+## Set pywb running
+
+Run the proxy that will pull and record:
+
+```sh
+# Create a collection to record things into:
+hatch run wb-manager init mementos
+# Set the proxy running (it's on localhost:8080):
+hatch run wayback --threads 12 > wayback.log 2>&1 &
+```
+
+The <./config.yaml> was pretty fiddly to get right for this!
+
+## Run the screen shot capture
 
 Set up shot-scraper
 
@@ -23,22 +41,21 @@ Set up shot-scraper
 hatch run shot-scraper install -b chromium
 ```
 
-Run the proxy that will pull and record:
+Take the URLs from the CDX file and populate a `shots.yml` file.
+
+Then run `shot-scraper` with the right settings, so everything goes via the proxy:
 
 ```sh
-hatch run wayback > wayback.log 2>&1 &
+hatch run shot-scraper multi -b chromium --browser-arg '--ignore-certificate-errors' --browser-arg '--proxy-server=http://localhost:8080' shots.yml
 ```
 
-```sh
-hatch run shot-scraper multi -b chromium --browser-arg '--ignore-certificate-errors --proxy-server=http://localhost:8080' shots.yml
-```
-
-Ran this against about 80 Twitter URLs. A hanfful of errors, presumably due to rate limiting by the source archive, but it's difficult to tell. Generally reasonable results, but long waits needed between pages to try to ensure minimal blocking.
+Ran this against about 80 Twitter URLs. A handful of errors, presumably due to rate limiting by the source archive, but it's difficult to tell. Generally reasonable results, but long waits (30s+) needed between pages to try to ensure minimal blocking.
 
 - Using the `multi` mode and config is cumbersome as you need to repeat a lot of config.
 - It will auto-generate names for the screenshots, but then seems to repeat screenshots and give them new names with `.1` etc. Which kinda defeats the purpose.
 - Having to set all the browser options etc. at the command-line is obviously rather brittle.
 - No video, presumably because Chromium?
+- This only gets one instance per URL, the earliest one.
 
 So, it would make sense to wrap this all up as a new command that would launch the proxy, run the shots, and gather the results. e.g.
 
@@ -46,17 +63,28 @@ So, it would make sense to wrap this all up as a new command that would launch t
 $ memento-lifeboat collection-urls.txt
 ```
 
+Perhaps using <https://pywb.readthedocs.io/en/latest/manual/warcserver.html#custom-warcserver-deployments> rather than a config file so it's all in code. Or maybe `export PYWB_CONFIG_FILE=...../config.yaml`... yes that works and is easier to manage.
+
 With this generating a `collection-urls.wacz` by default.
 
+## WACZ Creation & Access
+
+Made a WACZ
+
+```sh
+wacz create -o anjackson-net-2025-02-08.wacz -t -d collections/mementos/archive/MLB-20250208201638089003-EMEOIDCD.warc.gz
+```
+
+Copied it up so an S3 store (<https://european-alternatives.eu/category/object-storage-providers>, <https://www.s3compare.io/>) that I've made accessible over the web (<https://storj.dev/dcs/code/static-site-hosting>):
 
 ```sh
 rclone copy memento-lifeboats dr:memento-lifeboats
 ```
 
+Resulting in <https://memento-lifeboats.anjackson.dev/anjackson-net-2025-02-08/>
 
-## Extraction
+## Extracted WARC Records
 
-https://pywb.readthedocs.io/en/latest/manual/warcserver.html#custom-warcserver-deployments
 
 
 Example WARC when original was accessed via the Memento API.
