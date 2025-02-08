@@ -93,6 +93,21 @@ rclone copy slivers dr:slivers
 
 Resulting in <https://slivers.anjackson.dev/anjackson-net-2025-02-08/>
 
+
+
+## Example
+
+```sh
+hatch run wb-manager init mementos
+export PYWB_CONFIG_FILE=../../config.yaml 
+hatch run wayback > wayback.log 2>&1 &
+hatch run shot-scraper multi -b chromium --browser-arg '--ignore-certificate-errors' --browser-arg '--proxy-server=http://localhost:8080' shots.yaml 
+hatch run wacz create -o example-com.wacz -t -d collections/mementos/archive/SLIVER-20250208210345321032-57CQFSUN.warc.gz
+ ```
+Then test in <https://replayweb.page/>
+
+Then clean up and upload
+
 ## Extracted WARC Records
 
 

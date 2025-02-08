@@ -33,7 +33,7 @@ recorder:
   # Only record what comes through the archival source channel:
   source_filter: source
   # How the WARCs should be named:
-  filename_template: MLB-{timestamp}-{random}.warc.gz
+  filename_template: SLIVER-{timestamp}-{random}.warc.gz
   # Note that if we add a dedup_policy, we can instantly update the index as we go, but we need a redis server:
   # https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=dedup_policy#dedup-options-for-recording
   #dedup_policy: skip
