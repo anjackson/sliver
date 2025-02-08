@@ -1,7 +1,9 @@
 Sliver
 ======
 
-An ['archival sliver'](), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for gathering times held in web archives or from the live web.
+An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for gathering small sets of pages from web archives or from the live web.
+
+## Outline Workflow
 
 The overall workflow is:
 
@@ -19,7 +21,6 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install hatch
 ```
-
 
 ## Generating a list of URLs
 
