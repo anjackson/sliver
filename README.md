@@ -1,15 +1,24 @@
-Memento Lifeboat
-================
+Sliver
+======
 
-An experimental ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for replicating pages held in web archives.
+An ['archival sliver'](), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for gathering times held in web archives or from the live web.
 
 The overall workflow is:
 
-- Set up [pywb](https://github.com/webrecorder/pywb) as a proxy to talk to web archives, and leverage it's support [extracting and recording items into WARCs with provenance info](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode).
+- Set up [pywb](https://github.com/webrecorder/pywb) as a proxy to talk to the live web, or web archives, leveraging it's support [extracting and recording items into WARCs with provenance info](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode).
 - Generate a set of original URLs that we want to gather.
 - Use browser-based screen-shotting tools to run through that list of URLs, going via the pywb proxy.
 - Take the resulting WARC(s) and package them as WACZ with page detection and text extraction.
 - Bundle the WACZ with a suitable index.html wrapper to allow playback from static resources. This could be running playback directly, or use the screenshots as a gallery and have a separate playback page or frame.
+
+
+## Setup
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install hatch
+```
 
 
 ## Generating a list of URLs
@@ -46,7 +55,7 @@ Take the URLs from the CDX file and populate a `shots.yml` file.
 Then run `shot-scraper` with the right settings, so everything goes via the proxy:
 
 ```sh
-hatch run shot-scraper multi -b chromium --browser-arg '--ignore-certificate-errors' --browser-arg '--proxy-server=http://localhost:8080' shots.yml
+hatch run shot-scraper multi -b chromium --browser-arg '--ignore-certificate-errors' --browser-arg '--proxy-server=http://localhost:8080' --timeout 65000 shots.yml
 ```
 
 Ran this against about 80 Twitter URLs. A handful of errors, presumably due to rate limiting by the source archive, but it's difficult to tell. Generally reasonable results, but long waits (30s+) needed between pages to try to ensure minimal blocking.
@@ -60,7 +69,7 @@ Ran this against about 80 Twitter URLs. A handful of errors, presumably due to r
 So, it would make sense to wrap this all up as a new command that would launch the proxy, run the shots, and gather the results. e.g.
 
 ```sh
-$ memento-lifeboat collection-urls.txt
+$ sliver collection-urls.txt
 ```
 
 Perhaps using <https://pywb.readthedocs.io/en/latest/manual/warcserver.html#custom-warcserver-deployments> rather than a config file so it's all in code. Or maybe `export PYWB_CONFIG_FILE=...../config.yaml`... yes that works and is easier to manage.
@@ -78,10 +87,10 @@ wacz create -o anjackson-net-2025-02-08.wacz -t -d collections/mementos/archive/
 Copied it up so an S3 store (<https://european-alternatives.eu/category/object-storage-providers>, <https://www.s3compare.io/>) that I've made accessible over the web (<https://storj.dev/dcs/code/static-site-hosting>):
 
 ```sh
-rclone copy memento-lifeboats dr:memento-lifeboats
+rclone copy slivers dr:slivers
 ```
 
-Resulting in <https://memento-lifeboats.anjackson.dev/anjackson-net-2025-02-08/>
+Resulting in <https://slivers.anjackson.dev/anjackson-net-2025-02-08/>
 
 ## Extracted WARC Records
 

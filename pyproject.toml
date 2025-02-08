@@ -1,10 +1,10 @@
 [project]
-name = "memento_lifeboat"
+name = "sliver"
 version = "0.0.1"
 authors = [
   { name="Andy Jackson", email="anj@anjackson.net" },
 ]
-description = "Tiny lifeboats for web archive mementos"
+description = "A sliver of a sliver."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -21,8 +21,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/anjackson/memento-lifeboat"
-Issues = "https://github.com/anjackson/memento-lifeboat/issues"
+Homepage = "https://github.com/anjackson/sliver"
+Issues = "https://github.com/anjackson/sliver/issues"
 
 [build-system]
 requires = ["hatchling"]
