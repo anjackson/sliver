@@ -88,8 +88,8 @@ wacz create -o anjackson-net-2025-02-08.wacz -t -d collections/mementos/archive/
 Copied it up so an S3 store (<https://european-alternatives.eu/category/object-storage-providers>, <https://www.s3compare.io/>) that I've made accessible over the web (<https://storj.dev/dcs/code/static-site-hosting>):
 
 ```sh
-uplink share --dns slivers.anjackson.dev sj://slivers --not-after=none
 rclone copy slivers dr:slivers
+uplink share --dns slivers.anjackson.dev sj://slivers --not-after=none
 ```
 
 Resulting in <https://slivers.anjackson.dev/anjackson-net-2025-02-08/>

@@ -1,0 +1,9 @@
+- url: http://anjackson.net/
+  output: anjackson.net-homepage.png
+  wait: 10000
+- url: http://nutshells.anjackson.net/
+  output: nutshells-homepage.png
+  wait: 10000
+- url: http://echums.net/
+  output: echums-homepage.png
+  wait: 10000
