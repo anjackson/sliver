@@ -108,7 +108,7 @@ def cli():
 @click.option('-L', '--limit', type=int, default=10_000, help="Limit the number of results returned.", show_default=True)
 @click.option('-f', '--filter', type=str, default="statuscode:[23]..", help="Filter to apply to the results. Default value only returns HTTP 2XX or 3XX records.", show_default=True)
 @click.option('-r', '--resume-key', type=str, help="Resume key to use for the query.")
-@click.option('-o', '--output', type=click.File('w'), default="-", help="Output file to write the results to. Default writes to <STDOUT>.", show_default=True)
+@click.option('-o', '--output', type=click.File('w'), default="-", help="Output file to write the results to, in CDX format. Default writes to <STDOUT>.", show_default=True)
 def lookup(url, source, limit, filter, resume_key, output):
     """
     Looks up URLs based on a URL prefix.
