@@ -76,12 +76,21 @@ __TBD__ If you want to drive the crawl yourself, using `sliver proxy` to run the
 
 ### Package the results
 
+This sub-command has not been implemented yet. In the mean time, you can run this:
+
+```sh
+uwx wacz create -o archive.wacz -t -d ./collections/mementos/archive/*.warc.gz
+```
+
+
 __TBD__ Run `sliver package` to package the WARCs and screenshots etc. into a [WACZ web archive zip package](https://specs.webrecorder.net/wacz/latest/).
 
 
 ```sh
 uvx sliver package
 ```
+
+
 
 ### Usage
 

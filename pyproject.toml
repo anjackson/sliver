@@ -17,7 +17,8 @@ dependencies = [
   "pywb",
   "cdxj-indexer",
   "wacz",
-  "shot-scraper"
+  "shot-scraper",
+  "setuptools" # Seems to be an undeclared dependency of wacz
 ]
 
 [project.scripts]
