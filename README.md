@@ -1,7 +1,7 @@
 Sliver
 ======
 
-An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [pywb](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
+An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [`pywb`](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
 
 As well as archiving live web pages, this tools can leverage pywb's support for [neatly extracting URLs from other web archives and recording items with all the appropriate provenance information](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode). This means it can work like [hartator/wayback-machine-downloader](https://github.com/hartator/wayback-machine-downloader) but retain the additional information that the WARC web archiving format supports (see 'Why WARC?' below).
 
@@ -166,7 +166,7 @@ wacz create -o anjackson-net-2025-02-08.wacz -t -d collections/mementos/archive/
 Copied it up so an S3 store (<https://european-alternatives.eu/category/object-storage-providers>, <https://www.s3compare.io/>) that I've made accessible over the web (<https://storj.dev/dcs/code/static-site-hosting>):
 
 ```sh
-rclone copy slivers dr:slivers
+rclone copy -v slivers dr:slivers # or sync???
 uplink share --dns slivers.anjackson.dev sj://slivers --not-after=none
 ```
 
