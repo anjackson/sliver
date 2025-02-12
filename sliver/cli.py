@@ -112,7 +112,11 @@ def cli():
 @click.command()
 @click.argument("url")
 @source_option
-def lookup(url, source):
+@click.option('-L', '--limit', type=int, default=10_000, help="Limit the number of results returned.", show_default=True)
+@click.option('-f', '--filter', type=str, default="statuscode:[23]..", help="Filter to apply to the results. Default value only returns HTTP 2XX or 3XX records.", show_default=True)
+@click.option('-r', '--resume-key', type=str, help="Resume key to use for the query.")
+@click.option('-o', '--output', type=click.File('w'), default="-", help="Output file to write the results to.", show_default=True)
+def lookup(url, source, limit, filter, resume_key, output):
     """
     Looks up URLs based on a URL prefix.
 
@@ -121,7 +125,6 @@ def lookup(url, source):
     URL: URL to use as a prefix for the lookup query."""
     logging.info(f"Lookup URLs starting with: {url}")
     matchType = "prefix"
-    filter = "statuscode:[23].."
     if source == "cc-2025-05" or source == "cc":
         URL = "http://index.commoncrawl.org/CC-MAIN-2025-05-index"
         matchType = "host"
@@ -139,11 +142,14 @@ def lookup(url, source):
         "url": url,
         "collapse": "urlkey",
         "matchType": matchType,
-        "limit": 10000,
+        "limit": limit,
         "filter": filter,
         "showResumeKey": True
     }
+    if resume_key is not None:
+        params["resumeKey"] = resume_key
 
+    # Build the query string:
     query_string = urllib.parse.urlencode(params)
     full_url = f"{URL}?{query_string}"
     logging.info(f"Full URL: {full_url}")
@@ -157,7 +163,7 @@ def lookup(url, source):
                     ended = True
                 else:
                     # FIXME filter our lines that are not under the supplied path prefix (i.e. cope with host-level matching of the CC indexes)
-                    click.echo(cdx)
+                    click.echo(cdx, output)
             elif resumeKey is None:
                 resumeKey = line.decode('utf-8').strip()
 
