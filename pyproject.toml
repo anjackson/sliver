@@ -20,6 +20,9 @@ dependencies = [
   "shot-scraper"
 ]
 
+[project.scripts]
+sliver = "sliver.cli:cli"
+
 [project.urls]
 Homepage = "https://github.com/anjackson/sliver"
 Issues = "https://github.com/anjackson/sliver/issues"

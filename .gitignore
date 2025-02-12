@@ -3,3 +3,5 @@ dist
 proxy-certs
 collections/**/*.cdxj
 collections/**/*.warc.gz
+/slivers
+__pycache__
