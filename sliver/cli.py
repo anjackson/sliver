@@ -122,21 +122,23 @@ def lookup(url, source, limit, filter, resume_key, output):
         URL = "http://index.commoncrawl.org/CC-MAIN-2025-05-index"
         matchType = "host"
         logging.warning("Common Crawl index is used, which only supports host-level prefix searches. This may take a while...")
-        filter = ""
+        filter = None
     elif source == "ia":
         URL = "https://web.archive.org/cdx/search/cdx"
     else:
         raise ValueError("Unknown source!")
     logging.info(f"Using source: {source}")
 
+    # Set up the query parameters:
     params = {
         "url": url,
         "collapse": "urlkey",
         "matchType": matchType,
         "limit": limit,
-        "filter": filter,
         "showResumeKey": True
     }
+    if filter is not None:
+        params["filter"] = filter
     if resume_key is not None:
         params["resumeKey"] = resume_key
 
