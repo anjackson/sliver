@@ -1,12 +1,14 @@
 import os
 import time
+import yaml
 import click
 import logging
+import tempfile
 import urllib.parse
 import urllib.request
 from pywb.apps.cli import WaybackCli
-from pywb.utils.loaders import load_yaml_config
 from shot_scraper.cli import multi
+from shot_scraper.utils import filename_for_url
 
 logging.basicConfig(
     level=logging.INFO,
@@ -101,17 +103,22 @@ class EmbeddedWaybackCli(WaybackCli):
 
 # Shared options
 # How to handle.... http://index.commoncrawl.org/collinfo.json ??
-source_option = click.option('--source', type=click.Choice(['live', 'ia', 'cc']), default="live", help='Source of the data', show_default=True)
+source_option = click.option('-s', '--source', type=click.Choice(['live', 'ia']), default="live", help='Source to gather web resources from.', show_default=True)
 
 @click.group()
 def cli():
     pass
 
 @click.command()
-@click.argument('url')
+@click.argument("url")
 @source_option
 def lookup(url, source):
-    """URL to use as a prefix for the lookup query"""
+    """
+    Looks up URLs based on a URL prefix.
+
+    Can run queries against a web archive to find URLs that match a given prefix. Outputs the results in CDX format to <STDOUT>.
+    
+    URL: URL to use as a prefix for the lookup query."""
     logging.info(f"Lookup URLs starting with: {url}")
     matchType = "prefix"
     filter = "statuscode:[23].."
@@ -158,29 +165,63 @@ def lookup(url, source):
         logging.warning(f"Use the following resume key for the next query: {resumeKey}")
 
 @click.command()
+@click.argument("url-file", type=click.File('r'))
 @source_option
-def fetch(source):
+@click.option('-t', '--timestamp', type=str, default="19950101000000", help="Target timestamp to use when gathering records from web archives, 14-digit 'YYYYMMDDHHMMSS' format.", show_default=True)
+def fetch(url_file, source, timestamp):
+    """
+    Fetches archives and screenshots a set of URLs.
+    
+    URL_FILE: a plain test file with one URL per line.
+    """
     logging.info("Fetch command executed")
     # Set up the required folders for this to work:
     os.makedirs('collections/mementos/indexes', exist_ok=True)
     os.makedirs('collections/mementos/archive', exist_ok=True)
+    os.makedirs('collections/mementos/screenshots', exist_ok=True)
     # Start PyWB with the appropriate source configuration:
-    embedded = EmbeddedWaybackCli(args=['-t', '16', '--source', source])
+    embedded = EmbeddedWaybackCli(args=['--source', source])
     embedded.run()
     logging.info("PyWB started...")
-    # Give PyWB a little time to start up:
-    time.sleep(3.0)
+    # Give PyWB a little moment to start up:
+    time.sleep(3)
 
     # Loop through the supplied URLs and check if we need to fetch them, building up a config file:
+    shots = []
+    for url in url_file:
+        url = url.strip()
+        if url and not url.startswith("#"):
+            shots.append({
+                'url': url,
+                'output': f'collections/mementos/screenshots/{filename_for_url(url)}',
+                'wait': 15_000,
+                'width':  800,
+                'height': 800,
+                'padding': 0
+            })
+            # TODO: make some of the above optional config passed in as arguments.
 
     # Run the screen shot code on the URL, with the right proxy settings:
-    multi( [ '-b', 'chromium', '--browser-arg', '--ignore-certificate-errors', '--browser-arg', '--proxy-server=http://localhost:8080', 'shots.yml'] )
+    # Can add ['-b', 'chrome'] to force a particular browser to be used.
+    # e.g. hatch run playwright install chrome
+
+    # Set the proxy timestamp:
+    # TODO: Need to run each screenshot separately so we can restart with a new timestamp in the proxy.
+    # Might also have to note that because of the way it works, gathering multiple timestamps will probably not do what you want.
+    embedded.application.proxy_default_timestamp = timestamp
+
+    with tempfile.NamedTemporaryFile(mode="w", prefix="shots-", suffix=".yaml", delete=False) as fp:
+            # Write the shots to a file that will get removed after the screenshot code has run:
+            yaml.dump(shots, fp)
+            fp.close()
+
+            # Run the screenshot code with the shots file:
+            multi( [ '--browser-arg', '--ignore-certificate-errors', '--browser-arg', '--proxy-server=http://localhost:8080', fp.name] )
     
     # Shutdown PyWB:
     embedded.ge.stop()
-    logging.info("PyWB stopped")
+    logging.info("PyWB stopped.")
 
-    # Tidy up the output:
 
 
 cli.add_command(lookup)

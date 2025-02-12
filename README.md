@@ -1,23 +1,27 @@
 Sliver
 ======
 
-An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [`pywb`](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
+An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/) of the web. A bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making or replicating web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [`pywb`](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
 
-As well as archiving live web pages, this tools can leverage pywb's support for [neatly extracting URLs from other web archives and recording items with all the appropriate provenance information](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode). This means it can work like [hartator/wayback-machine-downloader](https://github.com/hartator/wayback-machine-downloader) but retain the additional information that the WARC web archiving format supports (see 'Why WARC?' below).
-
-Your use of this tool should take into account your legal context and the terms of use of the web sites and web archives you are working with.
+As well as archiving live web pages, this tools can leverage `pywb`'s support for [neatly extracting URLs from other web archives and recording items with all the appropriate provenance information](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode) (see [below for an example](#extracted-warc-records)). This means it can work like [hartator/wayback-machine-downloader](https://github.com/hartator/wayback-machine-downloader) but retain the additional information that the WARC and WACZ web archiving format supports (see [Why WARC/WACZ?](#why-warcwacz) below).
 
 ### Other Tools
+
+You open WARC and WACZ files using [ReplayWeb.page](https://replayweb.page/).
 
 For very high-quality web archiving, you should take a look at [ArchiveWeb.page](https://archiveweb.page/) (for manual crawling via a browser extension) and [Browsertrix](https://webrecorder.net/browsertrix/) (for larger-scale high-quality crawling, running on Kubernetes).
 
 You can find out more about web archives and web archiving tools and services via [iipc/awesome-web-archiving: An Awesome List for getting started with web archiving](https://github.com/iipc/awesome-web-archiving).
 
-### Why WARC?
+### Why WARC/WACZ?
 
-Web archives use the [WARC](https://en.wikipedia.org/wiki/WARC_(file_format)) format rather than just mirror the files from a website on disk. This is primarily because the WARC format also stores all the HTTP response headers, like `Content-Type`, that you need for playback to work reliably. They also store lots of contextual and provenance information.
+Web archives use the [WARC](https://en.wikipedia.org/wiki/WARC_(file_format)) format rather than just mirror the files from a website on disk. This is primarily because the WARC format also stores all the HTTP response headers that you sometimes need for playback to work reliably with more complex sites. For example, the `Content-Type` response header might be the only way the format of a file can be reliably determined. WARCs also store lots of contextual and provenance information.
+
+There is also the newer [WACZ](https://specs.webrecorder.net/wacz/1.1.1/) format, which wraps WARCs in a ZIP file, with additional metadata and indexes that make playback easier.
 
 ## Usage
+
+Please note that your use of this tool should take into account your legal context and the terms of use of the web sites and web archives you are working with.
 
 ### Setup
 
