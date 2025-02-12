@@ -39,9 +39,6 @@ class EmbeddedWaybackCli(WaybackCli):
         parser.add_argument(
             '--timestamp', default='19950101000000',
             help="Target timestamp to use for the proxy requests")
-        
-
-
 
     def load(self):
         # Set up the extra_config:
@@ -101,21 +98,17 @@ class EmbeddedWaybackCli(WaybackCli):
                           direct=False)
 
 
-# Shared options
-# How to handle.... http://index.commoncrawl.org/collinfo.json ??
-source_option = click.option('-s', '--source', type=click.Choice(['live', 'ia']), default="live", help='Source to gather web resources from.', show_default=True)
-
 @click.group()
 def cli():
     pass
 
 @click.command()
 @click.argument("url")
-@source_option
+@click.option('-s', '--source', type=click.Choice(['ia', 'cc']), default="ia", help="Source index to query for known URLs. Internet Archive Wayback Machine is 'ia'. Common Crawl is 'cc' (under development!).", show_default=True)
 @click.option('-L', '--limit', type=int, default=10_000, help="Limit the number of results returned.", show_default=True)
 @click.option('-f', '--filter', type=str, default="statuscode:[23]..", help="Filter to apply to the results. Default value only returns HTTP 2XX or 3XX records.", show_default=True)
 @click.option('-r', '--resume-key', type=str, help="Resume key to use for the query.")
-@click.option('-o', '--output', type=click.File('w'), default="-", help="Output file to write the results to.", show_default=True)
+@click.option('-o', '--output', type=click.File('w'), default="-", help="Output file to write the results to. Default writes to <STDOUT>.", show_default=True)
 def lookup(url, source, limit, filter, resume_key, output):
     """
     Looks up URLs based on a URL prefix.
@@ -132,8 +125,6 @@ def lookup(url, source, limit, filter, resume_key, output):
         filter = ""
     elif source == "ia":
         URL = "https://web.archive.org/cdx/search/cdx"
-    elif  source == "live":
-        raise ValueError("No currently defined method for looking up prefix queries on the live web!")
     else:
         raise ValueError("Unknown source!")
     logging.info(f"Using source: {source}")
@@ -172,9 +163,14 @@ def lookup(url, source, limit, filter, resume_key, output):
 
 @click.command()
 @click.argument("url-file", type=click.File('r'))
-@source_option
+@click.option('-s', '--source', type=click.Choice(['live', 'ia']), default="live", help='Source to gather web resources from.', show_default=True)
 @click.option('-t', '--timestamp', type=str, default="19950101000000", help="Target timestamp to use when gathering records from web archives, 14-digit 'YYYYMMDDHHMMSS' format.", show_default=True)
-def fetch(url_file, source, timestamp):
+@click.option('-W', '--wait', type=int, default=15_000, help="Time to wait before taking a screenshot, in milliseconds.", show_default=True)
+@click.option('-w', '--width', type=int, default=800, help="Width of the browser window.", show_default=True)
+@click.option('-h', '--height', type=int, default=800, help="Height of the browser window.", show_default=True)
+@click.option('-p', '--padding', type=int, help="Override default browser window padding. Use 0 for no padding.")
+#@click.option('-b', '--browser', type=str, help="Browser to use for the screenshots. If unspecified, uses shot-scraper default.")
+def fetch(url_file, source, timestamp, wait, width, height, padding):
     """
     Fetches archives and screenshots a set of URLs.
     
@@ -197,15 +193,18 @@ def fetch(url_file, source, timestamp):
     for url in url_file:
         url = url.strip()
         if url and not url.startswith("#"):
-            shots.append({
+            shot = {
                 'url': url,
                 'output': f'collections/mementos/screenshots/{filename_for_url(url)}',
-                'wait': 15_000,
-                'width':  800,
-                'height': 800,
-                'padding': 0
-            })
+                'wait': wait,
+                'width':  width,
+                'height': height
+            }
             # TODO: make some of the above optional config passed in as arguments.
+            if padding:
+                shot['padding'] = padding
+            # And add it:
+            shots.append(shot)
 
     # Run the screen shot code on the URL, with the right proxy settings:
     # Can add ['-b', 'chrome'] to force a particular browser to be used.
