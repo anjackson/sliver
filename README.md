@@ -9,7 +9,12 @@ As well as archiving live web pages, this tools can leverage `pywb`'s support fo
 
 You open WARC and WACZ files using [ReplayWeb.page](https://replayweb.page/).
 
-For very high-quality web archiving, you should take a look at [ArchiveWeb.page](https://archiveweb.page/) (for manual crawling via a browser extension) and [Browsertrix](https://webrecorder.net/browsertrix/) (for larger-scale high-quality crawling, running on Kubernetes).
+For high-quality web archiving, you could also try:
+
+- [ArchiveWeb.page](https://archiveweb.page/) (for manual crawling via a browser extension) 
+- [Browsertrix](https://webrecorder.net/browsertrix/) (for larger-scale high-quality crawling, with an extensible set of per-site behaviour scripts to improve archiving, running on Kubernetes)
+
+There's also [ArchiveBox](https://archivebox.io/) which provides a GUI as well as command line tools, but (as far as I can tell?) does not support direct browser-behind-a-web-proxy archiving. You can try it out by running it on [PikaPods](https://www.pikapods.com/).
 
 You can find out more about web archives and web archiving tools and services via [iipc/awesome-web-archiving: An Awesome List for getting started with web archiving](https://github.com/iipc/awesome-web-archiving).
 
@@ -97,7 +102,7 @@ Check the final WACZ package works using [ReplayWeb.page](https://replayweb.page
 
 If you want, upload the package to a static site as per [Embedding ReplayWeb.page](https://replayweb.page/docs/embedding/)
 
-__TBD__ Describe an example, e.g. using Storj_RClone or Glitch or ...
+__TBD__ Describe an example, e.g. using Storj+RClone or Glitch or ...
 
 ## Extracted WARC Records
 
