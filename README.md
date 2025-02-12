@@ -1,20 +1,98 @@
 Sliver
 ======
 
-An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for gathering small sets of pages from web archives or from the live web.
+An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/), a bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [pywb](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
 
-## Outline Workflow
+As well as archiving live web pages, this tools can leverage pywb's support for [neatly extracting URLs from other web archives and recording items with all the appropriate provenance information](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode). This means it can work like [hartator/wayback-machine-downloader](https://github.com/hartator/wayback-machine-downloader) but retain the additional information that the WARC web archiving format supports (see 'Why WARC?' below).
 
-The overall workflow is:
+Your use of this tool should take into account your legal context and the terms of use of the web sites and web archives you are working with.
 
-- Set up [pywb](https://github.com/webrecorder/pywb) as a proxy to talk to the live web, or web archives, leveraging it's support [extracting and recording items into WARCs with provenance info](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode).
-- Generate a set of original URLs that we want to gather.
-- Use browser-based screen-shotting tools to run through that list of URLs, going via the pywb proxy.
-- Take the resulting WARC(s) and package them as WACZ with page detection and text extraction.
-- Bundle the WACZ with a suitable index.html wrapper to allow playback from static resources. This could be running playback directly, or use the screenshots as a gallery and have a separate playback page or frame.
+### Other Tools
+
+For very high-quality web archiving, you should take a look at [ArchiveWeb.page](https://archiveweb.page/) (for manual crawling via a browser extension) and [Browsertrix](https://webrecorder.net/browsertrix/) (for larger-scale high-quality crawling, running on Kubernetes).
+
+You can find out more about web archives and web archiving tools and services via [iipc/awesome-web-archiving: An Awesome List for getting started with web archiving](https://github.com/iipc/awesome-web-archiving).
+
+### Why WARC?
+
+Web archives use the [WARC](https://en.wikipedia.org/wiki/WARC_(file_format)) format rather than just mirror the files from a website on disk. This is primarily because the WARC format also stores all the HTTP response headers, like `Content-Type`, that you need for playback to work reliably. They also store lots of contextual and provenance information.
+
+## Usage
+
+### Setup
+
+Set up a Python environment with `sliver` installed. This setup is based on using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
+
+```sh
+uv tool install https://github.com/anjackson/sliver.git
+```
+
+You should now be able to run e.g.
+
+```sh
+uvx sliver --help
+```
+
+Now create a directory to work in, to keep the archival files together as you work.
+
+```sh
+mkdir my-collection
+cd my-collection
+```
+
+### Create a list of URLs
+
+Create a list of URLs you want to archive.
+
+For crawls from web archives, you can use the `sliver lookup` command for this.
+
+### Fetch the URLs
+
+Run `sliver fetch` to run the screen-shotting process via the archiving proxy.
+
+```sh
+uvx sliver fetch urls.txt
+```
+(running on port 8080)
+
+During this process, the archives and screenshots are collected in subfolders of a local directory called  `./collections/mementos/`
 
 
-## Setup
+```sh
+uvx sliver fetch --source ia --timestamp 20050101000000 urls.txt
+```
+
+The archive gets updated...
+
+Check the screenshots you have produced to see if they are good enough. Re-run `sliver fetch` if needed.
+
+### Use the proxy to add to your archive
+
+__TBD__ If you want to drive the crawl yourself, using `sliver proxy` to run the web proxy and configure your browser to use it.
+
+### Package the results
+
+__TBD__ Run `sliver package` to package the WARCs and screenshots etc. into a [WACZ web archive zip package](https://specs.webrecorder.net/wacz/latest/).
+
+
+```sh
+uvx sliver package
+```
+
+### Usage
+
+Check the final package works using [ReplayWeb.page](https://replayweb.page/).
+
+If you want, upload the package to a static site as per [Embedding ReplayWeb.page](https://replayweb.page/docs/embedding/)
+
+Upload example
+
+
+## Initial Prototype Notes
+
+The following notes describe how the initial attempt at patching things together worked. These steps are being moved into the code.
+
+### Setup
 
 ```sh
 python3 -m venv .venv
@@ -22,7 +100,7 @@ source .venv/bin/activate
 pip install hatch
 ```
 
-## Generating a list of URLs
+### Generating a list of URLs
 
 ```sh
 curl -o out.cdx -g "https://web.archive.org/cdx/search/cdx?url=example.com&collapse=urlkey&matchType=prefix&limit=10000&filter=statuscode:[23]..&showResumeKey=true"
@@ -30,7 +108,7 @@ curl -o out.cdx -g "https://web.archive.org/cdx/search/cdx?url=example.com&colla
 
 Then extract the urls from the CDX. 
 
-## Set pywb running
+### Set pywb running
 
 Run the proxy that will pull and record:
 
@@ -43,7 +121,7 @@ hatch run wayback --threads 12 > wayback.log 2>&1 &
 
 The <./config.yaml> was pretty fiddly to get right for this!
 
-## Run the screen shot capture
+### Run the screen shot capture
 
 Set up shot-scraper
 
@@ -77,7 +155,7 @@ Perhaps using <https://pywb.readthedocs.io/en/latest/manual/warcserver.html#cust
 
 With this generating a `collection-urls.wacz` by default.
 
-## WACZ Creation & Access
+### WACZ Creation & Access
 
 Made a WACZ
 
@@ -95,8 +173,7 @@ uplink share --dns slivers.anjackson.dev sj://slivers --not-after=none
 Resulting in <https://slivers.anjackson.dev/anjackson-net-2025-02-08/>
 
 
-
-## Example
+### Example Command Sequence
 
 ```sh
 hatch run wb-manager init mementos
@@ -111,9 +188,7 @@ Then clean up and upload
 
 ## Extracted WARC Records
 
-
-
-Example WARC when original was accessed via the Memento API.
+Example WARC when pulled from a source archive via the [Memento API](https://timetravel.mementoweb.org/guide/api/).
 
 ```warc
 WARC/1.0
