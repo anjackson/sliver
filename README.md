@@ -48,27 +48,25 @@ cd my-collection
 
 Create a list of URLs you want to archive.
 
-For crawls from web archives, you can use the `sliver lookup` command for this.
+For crawls from web archives, you can use the `sliver lookup` command for this, and then edit the file down so it's just URLs.
 
 ### Fetch the URLs
 
-Run `sliver fetch` to run the screen-shotting process via the archiving proxy.
+Run `sliver fetch` to run the screenshotting process via the archiving proxy (running on port 8080, so that port needs to be free).
 
 ```sh
 uvx sliver fetch urls.txt
 ```
-(running on port 8080)
 
-During this process, the archives and screenshots are collected in subfolders of a local directory called  `./collections/mementos/`
-
+Alternatively, you can fetch records from a web archive, specifying a target timestamp for the records that should be retrieved:
 
 ```sh
 uvx sliver fetch --source ia --timestamp 20050101000000 urls.txt
 ```
 
-The archive gets updated...
+During this process, the archives and screenshots are collected in subfolders of a local directory called  `./collections/mementos/`
 
-Check the screenshots you have produced to see if they are good enough. Re-run `sliver fetch` if needed.
+If you re-run the command, and new resources will be fetched and added to a new WARC file. Check the screenshots you have produced to see if they are good enough. Re-run `sliver fetch` if needed.
 
 ### Use the proxy to add to your archive
 
@@ -76,11 +74,13 @@ __TBD__ If you want to drive the crawl yourself, using `sliver proxy` to run the
 
 ### Package the results
 
-This sub-command has not been implemented yet. In the mean time, you can run this:
+This sub-command has not been implemented yet. In the meantime, you can run this:
 
 ```sh
 uwx wacz create -o archive.wacz -t -d ./collections/mementos/archive/*.warc.gz
 ```
+
+__EXCEPT__ there seems to be an undeclared dependency on `setuptools` so that fails. You must install [`wacz`](https://github.com/webrecorder/py-wacz) separately.
 
 
 __TBD__ Run `sliver package` to package the WARCs and screenshots etc. into a [WACZ web archive zip package](https://specs.webrecorder.net/wacz/latest/).
@@ -91,14 +91,33 @@ uvx sliver package
 ```
 
 
+### Using the WACZ
 
-### Usage
-
-Check the final package works using [ReplayWeb.page](https://replayweb.page/).
+Check the final WACZ package works using [ReplayWeb.page](https://replayweb.page/).
 
 If you want, upload the package to a static site as per [Embedding ReplayWeb.page](https://replayweb.page/docs/embedding/)
 
-Upload example
+__TBD__ Describe an example, e.g. using Storj_RClone or Glitch or ...
+
+## Extracted WARC Records
+
+Example WARC when pulled from a source archive via the [Memento API](https://timetravel.mementoweb.org/guide/api/).
+
+```warc
+WARC/1.0
+WARC-Type: response
+WARC-Record-ID: <urn:uuid:e082c042-e56d-11ef-bbba-d982d0cb2308>
+WARC-Target-URI: https://example.com/
+WARC-Date: 2025-02-07T00:00:31Z
+WARC-Source-URI: https://web.archive.org/web/20250207000031id_/https://example.com/
+WARC-Creation-Date: 2025-02-07T16:09:15Z
+WARC-IP-Address: 207.241.237.3
+Content-Type: application/http; msgtype=response
+Content-Length: 2239
+WARC-Payload-Digest: sha1:YXWQ7LLPPIZ7CVO6DVQ4U3Y2IO5M42AG
+WARC-Block-Digest: sha1:HBKFWTAU4TPQWD5CNKVIJVW2CANQUTRN
+
+```
 
 
 ## Initial Prototype Notes
@@ -199,22 +218,3 @@ Then test in <https://replayweb.page/>
 
 Then clean up and upload
 
-## Extracted WARC Records
-
-Example WARC when pulled from a source archive via the [Memento API](https://timetravel.mementoweb.org/guide/api/).
-
-```warc
-WARC/1.0
-WARC-Type: response
-WARC-Record-ID: <urn:uuid:e082c042-e56d-11ef-bbba-d982d0cb2308>
-WARC-Target-URI: https://example.com/
-WARC-Date: 2025-02-07T00:00:31Z
-WARC-Source-URI: https://web.archive.org/web/20250207000031id_/https://example.com/
-WARC-Creation-Date: 2025-02-07T16:09:15Z
-WARC-IP-Address: 207.241.237.3
-Content-Type: application/http; msgtype=response
-Content-Length: 2239
-WARC-Payload-Digest: sha1:YXWQ7LLPPIZ7CVO6DVQ4U3Y2IO5M42AG
-WARC-Block-Digest: sha1:HBKFWTAU4TPQWD5CNKVIJVW2CANQUTRN
-
-```
