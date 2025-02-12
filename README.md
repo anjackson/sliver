@@ -16,7 +16,7 @@ For high-quality web archiving, you could also try:
 
 There's also [ArchiveBox](https://archivebox.io/) which provides a GUI as well as command line tools, but (as far as I can tell?) does not support direct browser-behind-a-web-proxy archiving. You can try it out by running it on [PikaPods](https://www.pikapods.com/).
 
-You can find out more about web archives and web archiving tools and services via [iipc/awesome-web-archiving: An Awesome List for getting started with web archiving](https://github.com/iipc/awesome-web-archiving).
+You can find out more about web archives and web archiving tools and services via [iipc/awesome-web-archiving: An Awesome List for getting started with web archiving](https://github.com/iipc/awesome-web-archiving) and [Web Archiving Community · ArchiveBox/ArchiveBox Wiki](https://github.com/ArchiveBox/ArchiveBox/wiki/Web-Archiving-Community).
 
 ### Why WARC/WACZ?
 
