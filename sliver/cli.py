@@ -170,7 +170,7 @@ def lookup(url, source, limit, filter, resume_key, output):
 @click.option('-W', '--wait', type=int, default=15_000, help="Time to wait before taking a screenshot, in milliseconds.", show_default=True)
 @click.option('-w', '--width', type=int, default=800, help="Width of the browser window.", show_default=True)
 @click.option('-h', '--height', type=int, default=800, help="Height of the browser window.", show_default=True)
-@click.option('-p', '--padding', type=int, help="Override default browser window padding. Use 0 for no padding.")
+@click.option('-p', '--padding', type=int, default=0, help="Override default browser window padding. Use 0 for no padding.")
 @click.option('-P', '--proxy-port', type=int, default=8080, help="Port to use for the pywb archiving proxy server.", show_default=True)
 #@click.option('-b', '--browser', type=str, help="Browser to use for the screenshots. If unspecified, uses shot-scraper default.")
 def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port):
@@ -183,8 +183,8 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
     os.makedirs('collections/mementos/indexes', exist_ok=True)
     os.makedirs('collections/mementos/archive', exist_ok=True)
     os.makedirs('collections/mementos/screenshots', exist_ok=True)
-    # Start PyWB with the appropriate source configurati
-    embedded = EmbeddedWaybackCli(args=['--source', source], default_port=proxy_port)
+    # Start PyWB with the appropriate source configuration. Threads throttles to reduce load on remote servers:
+    embedded = EmbeddedWaybackCli(args=['--source', source, '--threads', '2'], default_port=proxy_port)
     embedded.run()
     logging.info("PyWB started...")
     # Give PyWB a little moment to start up:
@@ -200,11 +200,11 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
                 'output': f'collections/mementos/screenshots/{filename_for_url(url)}',
                 'wait': wait,
                 'width':  width,
-                'height': height
+                'height': height,
+                'padding': padding,
+                # FIXME: Example of how to run some JavaScript on the page before taking the screenshot. Needs integrating with CLI options.
+                #'javascript': 'document.body.style.margin = 0;',
             }
-            # TODO: make some of the above optional config passed in as arguments.
-            if padding:
-                shot['padding'] = padding
             # And add it:
             shots.append(shot)
 
@@ -224,7 +224,11 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
             fp.close()
 
             # Run the screenshot code with the shots file:
-            multi( [ '--browser-arg', '--ignore-certificate-errors', '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', fp.name] )
+            multi( [ 
+                '--browser-arg', '--ignore-certificate-errors', 
+                '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', 
+                '--timeout', '60000', 
+                fp.name] )
     
     # Shutdown PyWB:
     embedded.ge.stop()
