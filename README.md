@@ -11,7 +11,8 @@ You open WARC and WACZ files using [ReplayWeb.page](https://replayweb.page/).
 
 For high-quality web archiving, you could also try:
 
-- [ArchiveWeb.page](https://archiveweb.page/) (for manual crawling via a browser extension) 
+- [ArchiveWeb.page](https://archiveweb.page/) (for manual crawling via a browser extension)
+-  [harvard-lil/scoop: 🍨 High-fidelity, browser-based, single-page web archiving library and CLI for witnessing the web.](https://github.com/harvard-lil/scoop) (built with `nodejs`, more sophisticated than this tool, but does not support replicating records from existing web archives)
 - [Browsertrix](https://webrecorder.net/browsertrix/) (for larger-scale high-quality crawling, with an extensible set of per-site behaviour scripts to improve archiving, running on Kubernetes)
 
 There's also [ArchiveBox](https://archivebox.io/) which provides a GUI as well as command line tools, but (as far as I can tell?) does not support direct browser-behind-a-web-proxy archiving. You can try it out by running it on [PikaPods](https://www.pikapods.com/).
