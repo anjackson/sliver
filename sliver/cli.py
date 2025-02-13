@@ -171,20 +171,20 @@ def lookup(url, source, limit, filter, resume_key, output):
 @click.option('-w', '--width', type=int, default=800, help="Width of the browser window.", show_default=True)
 @click.option('-h', '--height', type=int, default=800, help="Height of the browser window.", show_default=True)
 @click.option('-p', '--padding', type=int, help="Override default browser window padding. Use 0 for no padding.")
+@click.option('-P', '--proxy-port', type=int, default=8080, help="Port to use for the pywb archiving proxy server.", show_default=True)
 #@click.option('-b', '--browser', type=str, help="Browser to use for the screenshots. If unspecified, uses shot-scraper default.")
-def fetch(url_file, source, timestamp, wait, width, height, padding):
+def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port):
     """
     Fetches archives and screenshots a set of URLs.
     
     URL_FILE: a plain test file with one URL per line.
     """
-    logging.info("Fetch command executed")
     # Set up the required folders for this to work:
     os.makedirs('collections/mementos/indexes', exist_ok=True)
     os.makedirs('collections/mementos/archive', exist_ok=True)
     os.makedirs('collections/mementos/screenshots', exist_ok=True)
-    # Start PyWB with the appropriate source configuration:
-    embedded = EmbeddedWaybackCli(args=['--source', source])
+    # Start PyWB with the appropriate source configurati
+    embedded = EmbeddedWaybackCli(args=['--source', source], default_port=proxy_port)
     embedded.run()
     logging.info("PyWB started...")
     # Give PyWB a little moment to start up:
@@ -210,11 +210,12 @@ def fetch(url_file, source, timestamp, wait, width, height, padding):
 
     # Run the screen shot code on the URL, with the right proxy settings:
     # Can add ['-b', 'chrome'] to force a particular browser to be used.
-    # e.g. hatch run playwright install chrome
+    # You then might need to run `playwright install chrome` or similar.
 
     # Set the proxy timestamp:
-    # TODO: Need to run each screenshot separately so we can restart with a new timestamp in the proxy.
-    # Might also have to note that because of the way it works, gathering multiple timestamps will probably not do what you want.
+    # Need to run each screenshot separately if we want to restart with a new timestamp in the proxy.
+    # But, because of the way it works, gathering multiple timestamps will probably not do what you want.
+    # So may be best to use different collections for different timestamps.
     embedded.application.proxy_default_timestamp = timestamp
 
     with tempfile.NamedTemporaryFile(mode="w", prefix="shots-", suffix=".yaml", delete=False) as fp:
@@ -223,7 +224,7 @@ def fetch(url_file, source, timestamp, wait, width, height, padding):
             fp.close()
 
             # Run the screenshot code with the shots file:
-            multi( [ '--browser-arg', '--ignore-certificate-errors', '--browser-arg', '--proxy-server=http://localhost:8080', fp.name] )
+            multi( [ '--browser-arg', '--ignore-certificate-errors', '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', fp.name] )
     
     # Shutdown PyWB:
     embedded.ge.stop()
