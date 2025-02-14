@@ -78,6 +78,12 @@ If you re-run the command, and new resources will be fetched and added to a new 
 
 __TBD__ If you want to drive the crawl yourself, using `sliver proxy` to run the web proxy and configure your browser to use it.
 
+### Interact with the browser to add to your archive
+
+Connecting a browser to the proxy can be difficult, as the HTTPS connection most site now require have to be mediated using auto-generated proxy SSL certificates.  Configuring your own web browser to cope with this can be difficult.
+
+__TBD__ Running `sliver interact` launches a dedicated, pre-configured browser using [`shot-scraper`'s interactive mode](https://shot-scraper.datasette.io/en/stable/screenshots.html#interacting-with-the-page).  Anything you do in that browser window will be recorded by the archiving proxy, and a screenshot will be taken at the end. This helps extend and patch tricky crawls, but you shouldn't enter any personal information or passwords unless you don't mind them being archived along with the web pages!
+
 ### Package the results
 
 This sub-command has not been implemented yet. In the meantime, you can run this:
