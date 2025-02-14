@@ -89,10 +89,10 @@ __TBD__ Running `sliver interact` launches a dedicated, pre-configured browser u
 This sub-command has not been implemented yet. In the meantime, you can run this:
 
 ```sh
-uwx wacz create -o archive.wacz -t -d ./collections/mementos/archive/*.warc.gz
+uvx --with setuptools wacz create -o archive.wacz -t -d ./collections/mementos/archive/*.warc.gz
 ```
 
-__EXCEPT__ there seems to be an undeclared dependency on `setuptools` so that fails. You must install [`wacz`](https://github.com/webrecorder/py-wacz) separately.
+There seems to be an undeclared dependency on `setuptools`, hence the `--with setuptools`. You could also install [`wacz`](https://github.com/webrecorder/py-wacz) separately.
 
 
 __TBD__ Run `sliver package` to package the WARCs and screenshots etc. into a [WACZ web archive zip package](https://specs.webrecorder.net/wacz/latest/).
