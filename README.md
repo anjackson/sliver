@@ -7,6 +7,7 @@ This kind of works
 
 ```
 uvx --from https://github.com/anjackson/sliver.git sliver fetch --source ia --timestamp 20050101000000 urls.txt
+uvx --from playwright playwright install chrome
 ```
 
 But Chromium is making HTTPS proxying difficult, see https://issues.chromium.org/issues/41109334 
