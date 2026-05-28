@@ -1,6 +1,18 @@
 Sliver
 ======
 
+__WARNING__ This all seems to be broken due to incompatibilities and changes between versions!
+
+This kind of works
+
+```
+uvx --from https://github.com/anjackson/sliver.git sliver fetch --source ia --timestamp 20050101000000 urls.txt
+```
+
+But Chromium is making HTTPS proxying difficult, see https://issues.chromium.org/issues/41109334 
+
+---
+
 An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/) of the web. A bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making or replicating web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [`pywb`](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
 
 As well as archiving live web pages, this tools can leverage `pywb`'s support for [neatly extracting URLs from other web archives and recording items with all the appropriate provenance information](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode) (see [below for an example](#extracted-warc-records)). This means it can work like [hartator/wayback-machine-downloader](https://github.com/hartator/wayback-machine-downloader) but retain the additional information that the WARC and WACZ web archiving format supports (see [Why WARC/WACZ?](#why-warcwacz) below).
@@ -34,8 +46,8 @@ Please note that your use of this tool should take into account your legal conte
 Set up a Python environment with `sliver` installed. This setup is based on using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
 
 ```sh
-uv tool install -p python3.12 https://github.com/anjackson/sliver.git
-uvx playwright install
+uv tool install -p python3.12 --from https://github.com/anjackson/sliver.git sliver
+uvx playwright install chromium
 ```
 Note that earlier versions of Python are not supported to to incompatibilities from the `gvent` library between `pywb` and `playwright`.
 
@@ -71,6 +83,7 @@ uvx sliver fetch urls.txt
 Alternatively, you can fetch records from a web archive, specifying a target timestamp for the records that should be retrieved:
 
 ```sh
+uvx --from https://github.com/anjackson/sliver.git sliver fetch --source ia --timestamp 20050101000000 urls.txt
 uvx sliver fetch --source ia --timestamp 20050101000000 urls.txt
 ```
 
