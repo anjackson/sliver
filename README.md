@@ -34,9 +34,12 @@ Please note that your use of this tool should take into account your legal conte
 Set up a Python environment with `sliver` installed. This setup is based on using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
 
 ```sh
-uv tool install -p python3.11 https://github.com/anjackson/sliver.git
+uv tool install -p python3.12 https://github.com/anjackson/sliver.git
+uvx playwright install
 ```
-Note that later versions of Python are [not yet supported by the upstream dependency pywb](https://github.com/webrecorder/pywb/issues/890).
+Note that earlier versions of Python are not supported to to incompatibilities from the `gvent` library between `pywb` and `playwright`.
+
+Note that the `uvx playwright install` initiates the download of a suitable browser engine.
 
 You should now be able to run e.g.
 
