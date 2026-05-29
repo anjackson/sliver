@@ -218,6 +218,7 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
     # So may be best to use different collections for different timestamps.
     embedded.application.proxy_default_timestamp = timestamp
 
+    logging.error("TEST 2")
     with tempfile.NamedTemporaryFile(mode="w", prefix="shots-", suffix=".yaml", delete=False) as fp:
             # Write the shots to a file that will get removed after the screenshot code has run:
             yaml.dump(shots, fp)
@@ -227,7 +228,7 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
             multi( [
                 '--browser-arg', '--ignore-ssl-errors', 
                 '--browser-arg', '--ignore-certificate-errors',
-                '--browser-arg', '--test-case',
+                '--browser-arg', '--ignore-urlfetcher-cert-requests',
                 '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', 
                 '--timeout', '60000', 
                 fp.name] )
@@ -242,6 +243,5 @@ cli.add_command(lookup)
 cli.add_command(fetch)
 
 if __name__ == "__main__":
-    logging.error("WHY NO SEE THIS?")
     cli()
  
