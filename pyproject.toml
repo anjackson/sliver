@@ -6,7 +6,7 @@ authors = [
 ]
 description = "A sliver of a sliver."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
@@ -14,10 +14,11 @@ classifiers = [
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 dependencies = [
-  "pywb@git+https://github.com/webrecorder/pywb#sha1=9de84beead449b1ad61c756e9c031b9e6cc645e6",
+  "pywb@git+https://github.com/webrecorder/pywb",
   "cdxj-indexer",
   "wacz",
-  "shot-scraper"
+  "playwright==1.38.0",
+  "typer==0.11.1"
 ]
 
 [project.scripts]

@@ -1,14 +1,14 @@
 import os
+import re
 import time
-import yaml
 import click
 import logging
 import tempfile
 import urllib.parse
 import urllib.request
 from pywb.apps.cli import WaybackCli
-from shot_scraper.cli import multi
-from shot_scraper.utils import filename_for_url
+from playwright.sync_api import Page, expect
+from playwright.sync_api import sync_playwright
 
 logging.basicConfig(
     level=logging.INFO,
@@ -98,6 +98,9 @@ class EmbeddedWaybackCli(WaybackCli):
                           direct=False)
 
 
+def filename_for_url(url):
+    return re.sub(r'\W+', '-', url).strip('-').lower()
+
 @click.group()
 def cli():
     pass
@@ -167,7 +170,7 @@ def lookup(url, source, limit, filter, resume_key, output):
 @click.argument("url-file", type=click.File('r'))
 @click.option('-s', '--source', type=click.Choice(['live', 'ia']), default="live", help='Source to gather web resources from.', show_default=True)
 @click.option('-t', '--timestamp', type=str, default="19950101000000", help="Target timestamp to use when gathering records from web archives, 14-digit 'YYYYMMDDHHMMSS' format.", show_default=True)
-@click.option('-W', '--wait', type=int, default=15_000, help="Time to wait before taking a screenshot, in milliseconds.", show_default=True)
+@click.option('-W', '--wait', type=int, default=15, help="Time to wait before taking a screenshot, in seconds.", show_default=True)
 @click.option('-w', '--width', type=int, default=800, help="Width of the browser window.", show_default=True)
 @click.option('-h', '--height', type=int, default=800, help="Height of the browser window.", show_default=True)
 @click.option('-p', '--padding', type=int, default=0, help="Override default browser window padding. Use 0 for no padding.")
@@ -190,49 +193,43 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
     # Give PyWB a little moment to start up:
     time.sleep(3)
 
-    # Loop through the supplied URLs and check if we need to fetch them, building up a config file:
-    shots = []
-    for url in url_file:
-        url = url.strip()
-        if url and not url.startswith("#"):
-            shot = {
-                'url': url,
-                'output': f'collections/mementos/screenshots/{filename_for_url(url)}',
-                'wait': wait,
-                'width':  width,
-                'height': height,
-                'padding': padding,
-                # FIXME: Example of how to run some JavaScript on the page before taking the screenshot. Needs integrating with CLI options.
-                #'javascript': 'document.body.style.margin = 0;',
-            }
-            # And add it:
-            shots.append(shot)
-
-    # Run the screen shot code on the URL, with the right proxy settings:
-    # Can add ['-b', 'chrome'] to force a particular browser to be used.
-    # You then might need to run `playwright install chrome` or similar.
-
     # Set the proxy timestamp:
     # Need to run each screenshot separately if we want to restart with a new timestamp in the proxy.
     # But, because of the way it works, gathering multiple timestamps will probably not do what you want.
     # So may be best to use different collections for different timestamps.
     embedded.application.proxy_default_timestamp = timestamp
 
-    logging.error("TEST 2")
-    with tempfile.NamedTemporaryFile(mode="w", prefix="shots-", suffix=".yaml", delete=False) as fp:
-            # Write the shots to a file that will get removed after the screenshot code has run:
-            yaml.dump(shots, fp)
-            fp.close()
 
-            # Run the screenshot code with the shots file:
-            multi( [
-                '--browser-arg', '--ignore-ssl-errors', 
-                '--browser-arg', '--ignore-certificate-errors',
-                '--browser-arg', '--ignore-urlfetcher-cert-requests',
-                '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', 
-                '--timeout', '60000', 
-                fp.name] )
-    
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=[
+            '--ignore-certificate-errors', # These don't work, as they have been deprecated
+            '--ignore-ssl-errors',
+            f'--proxy-server=http://localhost:{proxy_port}' ])
+        context = browser.new_context(
+            ignore_https_errors=True,
+            #user_agent='My user agent',
+            viewport={ 'width': width, 'height': height },
+        )
+        page = context.new_page()
+
+
+        # Loop through the supplied URLs and check if we need to fetch them, building up a config file:
+        for url in url_file:
+            url = url.strip()
+            if url and not url.startswith("#"):
+                page.goto(url, wait_until='domcontentloaded')
+                time.sleep(wait)
+                output_screenshot = f'collections/mementos/screenshots/{filename_for_url(url)}'
+                page.screenshot(path=output_screenshot, full_page=True)
+                print(page.title())
+        # And close:
+        browser.close()
+
+
+    # 'padding': padding,
+    # FIXME: Example of how to run some JavaScript on the page before taking the screenshot. Needs integrating with CLI options.
+    #'javascript': 'document.body.style.margin = 0;',
+
     # Shutdown PyWB:
     embedded.ge.stop()
     logging.info("PyWB stopped.")
