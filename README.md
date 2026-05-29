@@ -47,7 +47,7 @@ Please note that your use of this tool should take into account your legal conte
 Set up a Python environment with `sliver` installed. This setup is based on using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
 
 ```sh
-uv tool install -p python3.12 --from https://github.com/anjackson/sliver.git sliver
+uv tool install -p python3.10 git+https://github.com/anjackson/sliver
 uvx playwright install chromium
 ```
 Note that earlier versions of Python are not supported to to incompatibilities from the `gvent` library between `pywb` and `playwright`.
@@ -57,7 +57,7 @@ Note that the `uvx playwright install` initiates the download of a suitable brow
 You should now be able to run e.g.
 
 ```sh
-uvx sliver --help
+uvx -p python3.10 sliver --help
 ```
 
 Now create a directory to work in, to keep the archival files together as you work.
