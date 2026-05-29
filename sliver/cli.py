@@ -207,7 +207,6 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
             }
             # And add it:
             shots.append(shot)
-    print("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     # Run the screen shot code on the URL, with the right proxy settings:
     # Can add ['-b', 'chrome'] to force a particular browser to be used.
@@ -218,19 +217,17 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
     # But, because of the way it works, gathering multiple timestamps will probably not do what you want.
     # So may be best to use different collections for different timestamps.
     embedded.application.proxy_default_timestamp = timestamp
-    print("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-    logging.error("WHY NO SEE THIS?")
     with tempfile.NamedTemporaryFile(mode="w", prefix="shots-", suffix=".yaml", delete=False) as fp:
             # Write the shots to a file that will get removed after the screenshot code has run:
             yaml.dump(shots, fp)
             fp.close()
 
-            print("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             # Run the screenshot code with the shots file:
-            multi( [ 
+            multi( [
                 '--browser-arg', '--ignore-ssl-errors', 
-                '--browser-arg', '--ignore-certificate-errors', 
+                '--browser-arg', '--ignore-certificate-errors',
+                '--browser-arg', '--test-case',
                 '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', 
                 '--timeout', '60000', 
                 fp.name] )
@@ -246,6 +243,5 @@ cli.add_command(fetch)
 
 if __name__ == "__main__":
     logging.error("WHY NO SEE THIS?")
-    print("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     cli()
  
