@@ -225,8 +225,7 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
 
             # Run the screenshot code with the shots file:
             multi( [ 
-                '-b', 'chrome',
-                '--browser-arg', '--test-type', # Chromium ignored the ignore https://issues.chromium.org/issues/41109334
+                '--browser-arg', '--ignore-ssl-errors', 
                 '--browser-arg', '--ignore-certificate-errors', 
                 '--browser-arg', f'--proxy-server=http://localhost:{proxy_port}', 
                 '--timeout', '60000', 
@@ -242,5 +241,6 @@ cli.add_command(lookup)
 cli.add_command(fetch)
 
 if __name__ == "__main__":
+    print("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     cli()
  
