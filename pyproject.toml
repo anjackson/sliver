@@ -14,7 +14,7 @@ classifiers = [
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 dependencies = [
-  "pywb@git+https://github.com/webrecorder/pywb",
+  "pywb",
   "cdxj-indexer",
   "wacz",
   "playwright==1.38.0",
