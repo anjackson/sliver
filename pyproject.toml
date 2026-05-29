@@ -18,7 +18,8 @@ dependencies = [
   "cdxj-indexer",
   "wacz",
   "playwright==1.38.0",
-  "typer==0.11.1"
+  "typer==0.11.1",
+  "setuptools=81.0.0"
 ]
 
 [project.scripts]
