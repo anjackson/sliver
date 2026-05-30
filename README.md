@@ -45,8 +45,8 @@ playwright install chromium
 Or, using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
 
 ```sh
-uv tool install -p python3.10 git+https://github.com/anjackson/sliver
-uvx playwright install chromium
+uv tool install -p python3.10 git+https://github.com/anjackson/sliver --refresh
+uvx -p python3.10 --from playwright playwright install chromium
 ```
 Note that earlier versions of Python are not supported to to incompatibilities from the `gvent` library between `pywb` and `playwright`.
 
