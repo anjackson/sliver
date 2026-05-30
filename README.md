@@ -1,18 +1,7 @@
 Sliver
 ======
 
-__WARNING__ This all seems to be broken due to incompatibilities and changes between versions!
-
-This kind of works
-
-```
-uvx --from https://github.com/anjackson/sliver.git sliver fetch --source ia --timestamp 20050101000000 urls.txt
-uvx --from playwright playwright install chrome
-```
-
-But Chromium is making HTTPS proxying difficult, see https://issues.chromium.org/issues/41109334 
-
----
+__WARNING:__ Gathering HTTPS urls from the live web is not working right now, because Chromium is making HTTPS proxying impossible, see https://issues.chromium.org/issues/41109334 - _However, this tool can still pull archives of pages from the Internet Archive Wayback Machine, as HTTPS+HTTP URLs are considered to be the same resource._
 
 An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/) of the web. A bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making or replicating web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [`pywb`](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
 
@@ -44,7 +33,16 @@ Please note that your use of this tool should take into account your legal conte
 
 ### Setup
 
-Set up a Python environment with `sliver` installed. This setup is based on using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
+Set up a Python 3.10 environment with `sliver` installed. 
+
+```sh
+python3 -m venv venv
+source venv/bin/activate
+pip install .
+playwright install chromium
+```
+
+Or, using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
 
 ```sh
 uv tool install -p python3.10 git+https://github.com/anjackson/sliver
@@ -55,6 +53,12 @@ Note that earlier versions of Python are not supported to to incompatibilities f
 Note that the `uvx playwright install` initiates the download of a suitable browser engine.
 
 You should now be able to run e.g.
+
+```sh
+sliver --help
+```
+
+Or, it using `uv`:
 
 ```sh
 uvx -p python3.10 sliver --help
@@ -78,14 +82,13 @@ For crawls from web archives, you can use the `sliver lookup` command for this, 
 Run `sliver fetch` to run the screenshotting process via the archiving proxy (running on port 8080, so that port needs to be free).
 
 ```sh
-uvx sliver fetch urls.txt
+uvx -p python3.10 sliver fetch urls.txt
 ```
 
 Alternatively, you can fetch records from a web archive, specifying a target timestamp for the records that should be retrieved:
 
 ```sh
-uvx --from https://github.com/anjackson/sliver.git sliver fetch --source ia --timestamp 20050101000000 urls.txt
-uvx sliver fetch --source ia --timestamp 20050101000000 urls.txt
+uvx -p python3.10 sliver fetch --source ia --timestamp 20050101000000 urls.txt
 ```
 
 During this process, the archives and screenshots are collected in subfolders of a local directory called  `./collections/mementos/`
@@ -94,7 +97,7 @@ If you re-run the command, and new resources will be fetched and added to a new 
 
 ### Use the proxy to add to your archive
 
-__TBD__ If you want to drive the crawl yourself, using `sliver proxy` to run the web proxy and configure your browser to use it.
+__NOT YET IMPLEMENTED__ If you want to drive the crawl yourself, using `sliver proxy` to run the web proxy and configure your browser to use it.
 
 ### Interact with the browser to add to your archive
 
@@ -113,7 +116,7 @@ uvx --with setuptools wacz create -o archive.wacz -t -d ./collections/mementos/a
 There seems to be an undeclared dependency on `setuptools`, hence the `--with setuptools`. You could also install [`wacz`](https://github.com/webrecorder/py-wacz) separately.
 
 
-__TBD__ Run `sliver package` to package the WARCs and screenshots etc. into a [WACZ web archive zip package](https://specs.webrecorder.net/wacz/latest/).
+__NOT YET IMPLEMENTED__ Run `sliver package` to package the WARCs and screenshots etc. into a [WACZ web archive zip package](https://specs.webrecorder.net/wacz/latest/).
 
 
 ```sh

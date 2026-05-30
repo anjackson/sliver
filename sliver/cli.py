@@ -98,8 +98,17 @@ class EmbeddedWaybackCli(WaybackCli):
                           direct=False)
 
 
-def filename_for_url(url):
-    return re.sub(r'\W+', '-', url).strip('-').lower()
+disallowed_re = re.compile("[^a-zA-Z0-9_-]")
+
+def filename_for_url(url, ext=None):
+    ext = ext or "png"
+    bits = urllib.parse.urlparse(url)
+    filename = (bits.netloc + bits.path).replace(".", "-").replace("/", "-").rstrip("-")
+    # Remove any characters outside of the allowed range
+    base_filename = disallowed_re.sub("", filename).lstrip("-")
+    filename = base_filename + "." + ext
+    return filename
+
 
 @click.group()
 def cli():
@@ -217,11 +226,17 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
         for url in url_file:
             url = url.strip()
             if url and not url.startswith("#"):
+                url_split = urllib.parse.urlsplit(url)
+                if url_split.scheme != 'http':
+                    url_split = url_split._replace(scheme='http')
+                    url = url_split.geturl()
+                    logging.warning(f"Only HTTP urls are supported! Switching URL to HTTP.")
+                # Get the page:
                 page.goto(url, wait_until='domcontentloaded')
                 time.sleep(wait)
                 output_screenshot = f'collections/mementos/screenshots/{filename_for_url(url)}'
                 page.screenshot(path=output_screenshot, full_page=True)
-                print(page.title())
+                logging.info(f"Downloaded {url}: '{page.title()}' Screenshot in: {output_screenshot}")
         # And close:
         browser.close()
 
