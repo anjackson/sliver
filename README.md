@@ -44,7 +44,7 @@ Or, using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that i
 
 ```sh
 uv tool install git+https://github.com/anjackson/sliver --refresh
-uvx -p python3.10 --from playwright playwright install chromium
+uvx playwright install chromium
 ```
 Note that earlier versions of Python are not supported to to incompatibilities from the `gvent` library between `pywb` and `playwright`.
 
