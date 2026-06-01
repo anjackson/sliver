@@ -1,8 +1,6 @@
 Sliver
 ======
 
-__WARNING:__ Gathering HTTPS urls from the live web is not working right now, because Chromium is making HTTPS proxying impossible, see https://issues.chromium.org/issues/41109334 - _However, this tool can still pull archives of pages from the Internet Archive Wayback Machine, as HTTPS+HTTP URLs are considered to be the same resource._
-
 An ['archival sliver'](https://inkdroid.org/2013/10/16/archival-sliver/) of the web. A bit like a ['data lifeboat'](https://www.flickr.org/programs/content-mobility/data-lifeboat/) for making or replicating web archives of small sets of pages. Uses [`shot-scraper`](https://shot-scraper.datasette.io/) to drive a web browser that generates screenshots of your URLs, but runs it through a [`pywb`](https://github.com/webrecorder/pywb) web proxy so it can produce a high quality archival version of what you download.
 
 As well as archiving live web pages, this tools can leverage `pywb`'s support for [neatly extracting URLs from other web archives and recording items with all the appropriate provenance information](https://pywb.readthedocs.io/en/latest/manual/configuring.html?highlight=remote#recording-mode) (see [below for an example](#extracted-warc-records)). This means it can work like [hartator/wayback-machine-downloader](https://github.com/hartator/wayback-machine-downloader) but retain the additional information that the WARC and WACZ web archiving format supports (see [Why WARC/WACZ?](#why-warcwacz) below).
@@ -45,7 +43,7 @@ playwright install chromium
 Or, using [`uv`](https://docs.astral.sh/uv/) and assumes you already have that installed.
 
 ```sh
-uv tool install -p python3.10 git+https://github.com/anjackson/sliver --refresh
+uv tool install git+https://github.com/anjackson/sliver --refresh
 uvx -p python3.10 --from playwright playwright install chromium
 ```
 Note that earlier versions of Python are not supported to to incompatibilities from the `gvent` library between `pywb` and `playwright`.
@@ -250,4 +248,5 @@ hatch run wacz create -o example-com.wacz -t -d collections/mementos/archive/SLI
 Then test in <https://replayweb.page/>
 
 Then clean up and upload
+
 

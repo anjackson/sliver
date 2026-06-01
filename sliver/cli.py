@@ -167,7 +167,7 @@ def lookup(url, source, limit, filter, resume_key, output):
                 if cdx == "":
                     ended = True
                 else:
-                    # FIXME filter our lines that are not under the supplied path prefix (i.e. cope with host-level matching of the CC indexes)
+                    # FIXME filter out lines that are not under the supplied path prefix (i.e. cope with host-level matching of the CC indexes)
                     click.echo(cdx, output)
             elif resumeKey is None:
                 resumeKey = line.decode('utf-8').strip()
@@ -210,9 +210,10 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
 
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, args=[
-            '--ignore-certificate-errors', # These don't work, as they have been deprecated
-            '--ignore-ssl-errors',
+        browser = p.chromium.launch(
+            headless=True, 
+            args=[
+            '--ignore-certificate-errors',
             f'--proxy-server=http://localhost:{proxy_port}' ])
         context = browser.new_context(
             ignore_https_errors=True,
@@ -226,11 +227,6 @@ def fetch(url_file, source, timestamp, wait, width, height, padding, proxy_port)
         for url in url_file:
             url = url.strip()
             if url and not url.startswith("#"):
-                url_split = urllib.parse.urlsplit(url)
-                if url_split.scheme != 'http':
-                    url_split = url_split._replace(scheme='http')
-                    url = url_split.geturl()
-                    logging.warning(f"Only HTTP urls are supported! Switching URL to HTTP.")
                 # Get the page:
                 page.goto(url, wait_until='domcontentloaded')
                 time.sleep(wait)
